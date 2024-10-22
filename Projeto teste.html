@@ -9,40 +9,43 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
+            padding: 20px;
             text-align: left; /* Alinhando o conteúdo à esquerda */
+            background-color: #f0f8ff; /* Cor de fundo suave */
         }
 
         /* Estilizando o título */
         h1 {
-            background-color: #f4f4f4;
+            background-color: #ffcc00; /* Amarelo claro */
+            color: #333; /* Cor do texto escura */
             padding: 20px;
-            margin: 0;
             text-align: center; /* Mantendo o título centralizado */
+            border-radius: 5px; /* Bordas arredondadas */
         }
 
         /* Estilo das seções de cada máquina */
         .machine-section {
             border: 1px solid #ccc;
-            margin: 20px 0 20px 20px; /* Alinhando os div à esquerda */
+            margin: 20px 0; /* Margem entre seções */
             padding: 20px;
-            width: 600px;
             background-color: #f9f9f9;
             display: flex; /* Alinhando o conteúdo em linha */
             align-items: center; /* Centraliza verticalmente */
+            border-radius: 5px; /* Bordas arredondadas */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra suave */
         }
 
         /* Estilizando as imagens */
         .machine-section img {
             width: 40%; /* Define o tamanho da imagem */
             height: auto;
+            border-radius: 5px; /* Bordas arredondadas nas imagens */
         }
 
         /* Estilizando o texto */
-        .machine-section p {
+        .machine-section div {
+            margin-left: 20px; /* Espaço entre imagem e texto */
             width: 50%; /* Define o espaço para o texto */
-            text-align: left; /* Alinha o texto à esquerda */
-            margin-left: 20px;
         }
 
         /* Estilo das barras de vida útil */
@@ -50,6 +53,7 @@
             height: 20px;
             width: 100%;
             margin-top: 10px;
+            border-radius: 5px; /* Bordas arredondadas */
         }
 
         .life-bar.red {
@@ -65,6 +69,21 @@
         .life-bar.green {
             background-color: green;
         }
+
+        /* Estilo do link */
+        a {
+            display: inline-block;
+            margin-top: 10px; /* Espaço acima do link */
+            padding: 10px 15px;
+            background-color: #4CAF50; /* Verde */
+            color: white; /* Texto branco */
+            text-decoration: none; /* Sem sublinhado */
+            border-radius: 5px; /* Bordas arredondadas */
+        }
+
+        a:hover {
+            background-color: #45a049; /* Tom mais escuro no hover */
+        }
     </style>
 </head>
 <body>
@@ -78,29 +97,29 @@
         <div>
             <p>Descrição: Esta máquina é utilizada para cortar materiais pesados.</p>
             <p>Data de Aquisição: 22/10/1990</p>
-            <p>Ultima Manuteção: Nunca</p>
+            <p>Última Manutenção: Nunca</p>
             <div class="life-bar red"></div> <!-- Barra de vida útil vermelha -->
-            <a href=Peças.html>PEÇAS</a>
+            <a href="Peças.html">PEÇAS</a>
         </div>
     </div>
 
     <!-- Seção da Máquina 2 -->
     <div class="machine-section">
-        <img src=https://th.bing.com/th/id/OIP.i14W03xZaDjICPtOxh8O_AHaHa?rs=1&pid=ImgDetMain alt="Imagem da Máquina 2">
+        <img src="https://th.bing.com/th/id/OIP.i14W03xZaDjICPtOxh8O_AHaHa?rs=1&pid=ImgDetMain" alt="Imagem da Máquina 2">
         <div>
-            <p>Descrição da Máquina 2: Esta máquina é utilizada para prensar peças metálicas.</p>
+            <p>Descrição: Esta máquina é utilizada para prensar peças metálicas.</p>
             <div class="life-bar yellow"></div> <!-- Barra de vida útil amarela -->
-            <a href=https://www.bing.com/images/search?q=Imagem+de+Maquina&form=HDRSC3&first=1>PEÇAS</a>
+            <a href="https://www.bing.com/images/search?q=Imagem+de+Maquina&form=HDRSC3&first=1">PEÇAS</a>
         </div>
     </div>
 
     <!-- Seção da Máquina 3 -->
     <div class="machine-section">
-        <img src=https://th.bing.com/th/id/OIP.Jgyi8lQ7cz1kq3FquVrmRAHaG9?rs=1&pid=ImgDetMain alt="Imagem da Máquina 3">
+        <img src="https://th.bing.com/th/id/OIP.Jgyi8lQ7cz1kq3FquVrmRAHaG9?rs=1&pid=ImgDetMain" alt="Imagem da Máquina 3">
         <div>
-            <p>Descrição da Máquina 3: Esta máquina é utilizada para moldagem de plásticos.</p>
+            <p>Descrição: Esta máquina é utilizada para moldagem de plásticos.</p>
             <div class="life-bar green"></div> <!-- Barra de vida útil verde -->
-            <a href=https://www.bing.com/images/search?q=Imagem+de+Maquina&form=HDRSC3&first=1>PEÇAS</a>
+            <a href="https://www.bing.com/images/search?q=Imagem+de+Maquina&form=HDRSC3&first=1">PEÇAS</a>
         </div>
     </div>
 

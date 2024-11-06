@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STEM Adventure - Jogo Educativo</title>
+    <style>
+        /* CSS */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: url("https://th.bing.com/th/id/OIP.r_XkiBnKqchMbaI30tEBoAHaEf?rs=1&pid=ImgDetMain");
+            background-size: cover;
+            background-position: center;
+            color: #fff;
+        }
+
+        #game-container {
+            text-align: center;
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            width: 400px;
+            color: #333;
+        }
+
+        header h1 {
+            color: #4c669f;
+            font-size: 28px;
+            text-shadow: 1px 1px 2px #333;
+        }
+
+        #character-select, #game-content, #lore-intro, #lore-end {
+            display: none;
+        }
+
+        #character-options {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+            transform: scale(1.1);
+        }
+
+        .option {
+            display: block;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: bisque;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .option:hover {
+            background-color: #ddd;
+            transform: scale(1.05);
+        }
+
+        #character-image, #game-character-image {
+            width: 100px;
+            height: auto;
+            margin-top: 10px;
+            border-radius: 50%;
+        }
+
+        #game-character-image {
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* Lore section */
+        #lore, #lore-intro, #lore-end {
+            font-style: italic;
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- HTML -->
+    <div id="game-container">
+        <header>
+            <h1>STEM Adventure</h1>
+            <p id="score-section">Pontuação: <span id="score">0</span></p>
+        </header>
+
+        <!-- Introdução à Lore -->
+        <div id="lore-intro">
+            <p>Você está prestes a entrar na "Terra dos Conhecimentos Esquecidos", um mundo onde os segredos da ciência e tecnologia foram abandonados e precisam ser recuperados. Guiada por lendas como Marie Curie, Ada Lovelace e Katherine Johnson, você deve resolver enigmas perdidos no tempo para restaurar o conhecimento e salvar o futuro.</p>
+            <button onclick="showCharacterSelection()">Escolher Personagem</button>
+        </div>
+
+        <!-- Seleção de Personagem -->
+        <div id="character-select">
+            <h2>Escolha seu personagem:</h2>
+            <div id="character-options">
+                <button onclick="selectCharacter('Marie Curie')">Marie Curie</button>
+                <button onclick="selectCharacter('Ada Lovelace')">Ada Lovelace</button>
+                <button onclick="selectCharacter('Katherine Johnson')">Katherine Johnson</button>
+            </div>
+            <img id="character-image" alt="Imagem do Personagem">
+            <p id="character-bio"></p>
+            <button onclick="startGame()">Iniciar Jogo</button>
+        </div>
+
+        <!-- Conteúdo do Jogo -->
+        <div id="game-content">
+            <p id="character"></p>
+            <img id="game-character-image" alt="Imagem do Personagem no Jogo">
+            <div id="challenge">
+                <p id="lore"></p>
+                <p id="question">Clique em "Novo Desafio" para começar!</p>
+                <button id="new-challenge-button">Novo Desafio</button>
+            </div>
+            <div id="options"></div>
+        </div>
+
+        <!-- Conclusão da Lore -->
+        <div id="lore-end">
+            <p>Parabéns! Você recuperou todos os conhecimentos perdidos e trouxe esperança para a "Terra dos Conhecimentos Esquecidos". Agora, com a ciência e a tecnologia restauradas, o futuro deste mundo está em suas mãos. Obrigado por sua coragem e determinação!</p>
+            <button onclick="restartGame()">Jogar Novamente</button>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        let score = 0;
+        let selectedCharacter = "";
+        let challengesCompleted = 0;
+        const totalChallenges = 7;  // Total de perguntas
+
+        // Personagens com imagens e biografias
+        const characters = {
+            "Marie Curie": {
+                bio: "Marie Curie foi uma cientista franco-polonesa conhecida por suas pesquisas em radioatividade.",
+                img: "https://quizizz.com/media/resource/gs/quizizz-media/quizzes/3135f2f6-f559-4bb4-8859-21dc9f930ba7"
+            },
+            "Ada Lovelace": {
+                bio: "Ada Lovelace foi uma matemática britânica considerada a primeira programadora da história.",
+                img: "https://upload.wikimedia.org/wikipedia/commons/a/a4/Ada_Lovelace_portrait.jpg"
+            },
+            "Katherine Johnson": {
+                bio: "Katherine Johnson foi uma matemática da NASA que calculou trajetórias espaciais críticas.",
+                img: "https://i.etsystatic.com/12091851/r/il/f2e09d/1638039222/il_1588xN.1638039222_h55t.jpg"
+            }
+        };
+
+        // Perguntas com lore para imersão
+        const questions = [
+            { question: "Uma máquina antiga precisa ser recalibrada. Qual é o resultado de 12 * 2?", lore: "A máquina enferrujada começa a se mexer...", options: ["22", "24", "26", "28"], answer: "24" },
+            { question: "Em uma caverna secreta, há um número misterioso. Qual é a raiz quadrada de 81?", lore: "A luz ilumina o número gravado na pedra...", options: ["7", "8", "9", "10"], answer: "9" },
+            { question: "Para abrir um cofre antigo, você precisa saber: Qual linguagem é usada para estilizar páginas web?", lore: "No painel do cofre há uma inscrição antiga...", options: ["HTML", "JavaScript", "CSS", "Python"], answer: "CSS" },
+            { question: "Um enigma numérico na porta secreta. Se A = 4 e B = 5, quanto é A + B?", lore: "A porta responde apenas ao conhecimento matemático...", options: ["8", "9", "10", "11"], answer: "9" },
+            { question: "Um sistema elétrico precisa ser reativado. Em que unidade medimos a potência elétrica?", lore: "Você vê um painel de controle com um símbolo estranho...", options: ["Volts", "Watts", "Ohms", "Ampères"], answer: "Watts" },
+            { question: "A biblioteca ancestral guarda um segredo. Quem foi a primeira mulher programadora?", lore: "As páginas dos livros antigos começam a brilhar...", options: ["Marie Curie", "Ada Lovelace", "Rosalind Franklin", "Margaret Hamilton"], answer: "Ada Lovelace" },
+            { question: "Um portal está prestes a se abrir. Qual é o resultado de 15 - 7?", lore: "Números flutuam no ar...", options: ["7", "8", "9", "10"], answer: "8" }
+        ];
+
+        // Início da introdução da história
+        document.getElementById("lore-intro").style.display = "block";
+
+        function showCharacterSelection() {
+            document.getElementById("lore-intro").style.display = "none";
+            document.getElementById("character-select").style.display = "block";
+        }
+
+        function selectCharacter(character) {
+            selectedCharacter = character;
+            const characterData = characters[character];
+            document.getElementById("character-bio").textContent = characterData.bio;
+            const characterImage = document.getElementById("character-image");
+            characterImage.src = characterData.img;
+            characterImage.style.display = "block";
+        }
+
+        function startGame() {
+            if (!selectedCharacter) {
+                alert("Escolha um personagem para começar!");
+                return;
+            }
+            document.getElementById("character-select").style.display = "none";
+            document.getElementById("game-content").style.display = "block";
+            document.getElementById("character").textContent = `Personagem: ${selectedCharacter}`;
+            document.getElementById("game-character-image").src = characters[selectedCharacter].img;
+        }
+
+        document.getElementById("new-challenge-button").addEventListener("click", newChallenge);
+
+        function newChallenge() {
+            if (challengesCompleted >= totalChallenges) {
+                endGame();
+                return;
+            }
+            const randomQuestion = questions[challengesCompleted];
+            displayQuestion(randomQuestion);
+        }
+
+        function displayQuestion(question) {
+            document.getElementById("question").textContent = question.question;
+            document.getElementById("lore").textContent = question.lore;
+            const optionsContainer = document.getElementById("options");
+            optionsContainer.innerHTML = "";
+
+            question.options.forEach(option => {
+                const optionButton = document.createElement("button");
+                optionButton.textContent = option;
+                optionButton.classList.add("option");
+                optionButton.addEventListener("click", () => checkAnswer(option, question.answer));
+                optionsContainer.appendChild(optionButton);
+            });
+        }
+
+        function checkAnswer(selected, correct) {
+            if (selected === correct) {
+                score += 10;
+                challengesCompleted++;
+                alert("Correto! Você avançou na sua jornada!");
+            } else {
+                alert("Incorreto. Tente novamente!");
+            }
+            document.getElementById("score").textContent = score;
+        }
+
+        function endGame() {
+            document.getElementById("game-content").style.display = "none";
+            document.getElementById("lore-end").style.display = "block";
+        }
+
+        function restartGame() {
+            score = 0;
+            challengesCompleted = 0;
+            document.getElementById("score").textContent = score;
+            document.getElementById("lore-end").style.display = "none";
+            document.getElementById("lore-intro").style.display = "block";
+        }
+    </script>
+</body>
+</html>

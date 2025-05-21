@@ -140,16 +140,26 @@
     function renderFerramentas() {
       const termo = searchInput.value.toLowerCase();
       table.innerHTML = "";
-      ferramentas.filter(f => f.nome.toLowerCase().includes(termo)).forEach(f => {
+      ferramentas.filter(f => f.nome.toLowerCase().includes(termo)).forEach((f, index) => {
         const row = `<tr>
           <td>${f.id}</td>
           <td>${f.nome}</td>
-          <td>${f.status}</td>
-          <td>${f.setor}</td>
+          <td>
+            <select onchange="alterarStatusDireto(${index}, this.value)">
+              <option ${f.status === 'Disponível' ? 'selected' : ''}>Disponível</option>
+              <option ${f.status === 'Em uso' ? 'selected' : ''}>Em uso</option>
+              <option ${f.status === 'Manutenção' ? 'selected' : ''}>Manutenção</option>
+            </select>
+          </td>
+          <td>
+            <select onchange="alterarSetorDireto(${index}, this.value)">
+              ${setores.map(s => `<option ${s === f.setor ? 'selected' : ''}>${s}</option>`).join('')}
+            </select>
+          </td>
           <td class="actions">
-            <i class="fas fa-qrcode" title="Gerar QR Code"></i>
-            <i class="fas fa-tools" title="Manutenção" onclick="registrarHistorico('${f.nome}', 'Enviado para manutenção')"></i>
-            <i class="fas fa-check-circle" title="Devolver" onclick="registrarHistorico('${f.nome}', 'Devolvido')"></i>
+            <i class="fas fa-qrcode" title="Gerar QR Code" onclick="gerarQRCode('${f.nome}')"></i>
+            <i class="fas fa-tools" title="Enviar p/ manutenção" onclick="alterarStatus(${index}, 'Manutenção')"></i>
+            <i class="fas fa-check-circle" title="Devolver" onclick="alterarStatus(${index}, 'Disponível')"></i>
           </td>
         </tr>`;
         table.innerHTML += row;
@@ -158,23 +168,55 @@
 
     function adicionarFerramenta() {
       const nome = prompt("Nome da nova ferramenta:");
-      if (nome) {
-        const novaFerramenta = {
-          id: (Math.random() * 10000).toFixed(0),
-          nome,
-          status: "Disponível",
-          setor: setores[0] || "-"
-        };
-        ferramentas.push(novaFerramenta);
-        registrarHistorico(nome, 'Adicionada ao sistema');
-        renderFerramentas();
+      if (!nome) return;
+
+      let setor = prompt("Informe o setor:");
+      if (!setor) return;
+      if (!setores.includes(setor)) {
+        if (confirm(`Setor '${setor}' não existe. Deseja adicioná-lo?`)) {
+          setores.push(setor);
+          renderSetores();
+        } else {
+          return;
+        }
       }
+
+      const novaFerramenta = {
+        id: (Math.random() * 10000).toFixed(0),
+        nome,
+        status: "Disponível",
+        setor
+      };
+      ferramentas.push(novaFerramenta);
+      registrarHistorico(nome, `Adicionada ao sistema no setor '${setor}' via Asset Pand`);
+      renderFerramentas();
+    }
+
+    function alterarStatus(index, novoStatus) {
+      const funcionario = prompt("Identificação Biométrica (simulada): Informe seu nome");
+      if (!funcionario) return alert("Ação cancelada.");
+      const ferramenta = ferramentas[index];
+      const acao = novoStatus === 'Disponível' ? 'Devolvida' : 'Enviada para manutenção';
+      ferramenta.status = novoStatus;
+      registrarHistorico(ferramenta.nome, `${acao} por ${funcionario} (via Bosch Biométrico)`);
+      renderFerramentas();
+    }
+
+    function alterarStatusDireto(index, status) {
+      ferramentas[index].status = status;
+      registrarHistorico(ferramentas[index].nome, `Status alterado manualmente para '${status}'`);
+    }
+
+    function alterarSetorDireto(index, setor) {
+      ferramentas[index].setor = setor;
+      registrarHistorico(ferramentas[index].nome, `Setor alterado manualmente para '${setor}'`);
     }
 
     function registrarHistorico(ferramenta, acao) {
       const timestamp = new Date().toLocaleString();
       historico.unshift(`${timestamp}: Ferramenta '${ferramenta}' - ${acao}`);
       renderHistorico();
+      verificarAlertas(ferramenta, acao);
     }
 
     function renderHistorico() {
@@ -193,6 +235,16 @@
 
     function renderSetores() {
       listaSetores.innerHTML = setores.map(s => `<li>${s}</li>`).join("");
+    }
+
+    function gerarQRCode(nome) {
+      alert(`QR Code gerado para: ${nome} (simulação)`);
+    }
+
+    function verificarAlertas(ferramenta, acao) {
+      if (acao.includes('manutenção') || acao.includes('extravio')) {
+        alert(`⚠️ Alerta do Asset Pand: Verifique a ferramenta '${ferramenta}'!`);
+      }
     }
 
     searchInput.addEventListener("input", renderFerramentas);

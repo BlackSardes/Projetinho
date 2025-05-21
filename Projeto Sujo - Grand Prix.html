@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestão de Ferramentas</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f8f9fa;
+    }
+    header {
+      background-color: #1f2937;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    .container {
+      padding: 1rem;
+    }
+    .search-add {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .search-add input {
+      width: 70%;
+      padding: 0.5rem;
+    }
+    .search-add button {
+      padding: 0.5rem 1rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+    table th, table td {
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    nav {
+      display: flex;
+      justify-content: space-around;
+      background: #343a40;
+      color: white;
+    }
+    nav div {
+      padding: 1rem;
+      cursor: pointer;
+    }
+    nav .active {
+      background: #495057;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .actions i {
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    .config-form input {
+      margin-bottom: 0.5rem;
+      padding: 0.5rem;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Gestão de Ferramentas</h1>
+  </header>
+
+  <nav>
+    <div class="tab-button active" data-tab="ferramentas">Ferramentas</div>
+    <div class="tab-button" data-tab="historico">Histórico</div>
+    <div class="tab-button" data-tab="config">Configurações</div>
+  </nav>
+
+  <div class="container">
+    <div id="ferramentas" class="tab-content active">
+      <div class="search-add">
+        <input type="text" id="searchInput" placeholder="Buscar ferramenta...">
+        <button onclick="adicionarFerramenta()">Nova Ferramenta</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Status</th>
+            <th>Setor</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="toolTable"></tbody>
+      </table>
+    </div>
+
+    <div id="historico" class="tab-content">
+      <h3>Histórico de Movimentações</h3>
+      <ul id="historicoList"></ul>
+    </div>
+
+    <div id="config" class="tab-content">
+      <h3>Configurações</h3>
+      <div class="config-form">
+        <label>Adicionar setor:</label>
+        <input type="text" id="novoSetor" placeholder="Nome do setor">
+        <button onclick="adicionarSetor()">Adicionar</button>
+        <h4>Setores Atuais:</h4>
+        <ul id="listaSetores"></ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ferramentas = [
+      { id: "1001", nome: "Furadeira", status: "Disponível", setor: "Manutenção" },
+      { id: "1002", nome: "Alicate", status: "Em uso", setor: "Solda" },
+      { id: "1003", nome: "Multímetro", status: "Manutenção", setor: "Elétrica" },
+      { id: "1004", nome: "Chave de fenda", status: "Disponível", setor: "Montagem" },
+    ];
+
+    const setores = ["Manutenção", "Solda", "Elétrica", "Montagem"];
+    const historico = [];
+
+    const table = document.getElementById("toolTable");
+    const searchInput = document.getElementById("searchInput");
+    const historicoList = document.getElementById("historicoList");
+    const listaSetores = document.getElementById("listaSetores");
+
+    function renderFerramentas() {
+      const termo = searchInput.value.toLowerCase();
+      table.innerHTML = "";
+      ferramentas.filter(f => f.nome.toLowerCase().includes(termo)).forEach(f => {
+        const row = `<tr>
+          <td>${f.id}</td>
+          <td>${f.nome}</td>
+          <td>${f.status}</td>
+          <td>${f.setor}</td>
+          <td class="actions">
+            <i class="fas fa-qrcode" title="Gerar QR Code"></i>
+            <i class="fas fa-tools" title="Manutenção" onclick="registrarHistorico('${f.nome}', 'Enviado para manutenção')"></i>
+            <i class="fas fa-check-circle" title="Devolver" onclick="registrarHistorico('${f.nome}', 'Devolvido')"></i>
+          </td>
+        </tr>`;
+        table.innerHTML += row;
+      });
+    }
+
+    function adicionarFerramenta() {
+      const nome = prompt("Nome da nova ferramenta:");
+      if (nome) {
+        const novaFerramenta = {
+          id: (Math.random() * 10000).toFixed(0),
+          nome,
+          status: "Disponível",
+          setor: setores[0] || "-"
+        };
+        ferramentas.push(novaFerramenta);
+        registrarHistorico(nome, 'Adicionada ao sistema');
+        renderFerramentas();
+      }
+    }
+
+    function registrarHistorico(ferramenta, acao) {
+      const timestamp = new Date().toLocaleString();
+      historico.unshift(`${timestamp}: Ferramenta '${ferramenta}' - ${acao}`);
+      renderHistorico();
+    }
+
+    function renderHistorico() {
+      historicoList.innerHTML = historico.map(item => `<li>${item}</li>`).join("");
+    }
+
+    function adicionarSetor() {
+      const input = document.getElementById("novoSetor");
+      const setor = input.value.trim();
+      if (setor && !setores.includes(setor)) {
+        setores.push(setor);
+        input.value = "";
+        renderSetores();
+      }
+    }
+
+    function renderSetores() {
+      listaSetores.innerHTML = setores.map(s => `<li>${s}</li>`).join("");
+    }
+
+    searchInput.addEventListener("input", renderFerramentas);
+
+    document.querySelectorAll(".tab-button").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".tab-button").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+        button.classList.add("active");
+        document.getElementById(button.dataset.tab).classList.add("active");
+      });
+    });
+
+    renderFerramentas();
+    renderSetores();
+  </script>
+</body>
+</html>
